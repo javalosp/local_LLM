@@ -1,0 +1,29 @@
+The standard virtual environment (venv) only selfcontains python packages
+For packages that require compiling C, C++,... code we need to have the appropriate build tools
+Therefore it's necessary to use a venv that also self contains those tools
+Moving to Conda
+From Terminal
+Load Conda
+eval "$(~/miniforge3/bin/conda shell.bash hook)"
+
+# Create a new environment named 'llm_env' with Python and the required build tools
+conda create --name llm_venv python=3.9 gxx_linux-64 cmake -c conda-forge -y
+
+# Activate the new environment
+conda activate llm_venv
+
+# Load the virtual environment
+source llm_venv/bin/activate # THIS DOESN'T SEEM TO BE NEEDED
+
+# Update pip
+pip install --upgrade pip
+
+# Install required libraries
+pip install -r requirements.txt
+
+# For GPU support
+CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install --force-reinstall --no-cache-dir llama-cpp-python
+
+# Install jupyterlab kernel
+python -m ipykernel install --user --name llm_venv --display-name "llm_venv (kernel)"
+

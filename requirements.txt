@@ -1,0 +1,8 @@
+# Install core libraries
+jupyterlab
+langchain
+langchain-community
+pypdf
+sentence-transformers
+faiss-cpu
+llama-cpp-python
