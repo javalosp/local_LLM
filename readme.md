@@ -1,15 +1,15 @@
-# Local RAG LLM Pipeline
+# Local LLM Pipeline
 
-This project provides a complete, local-only Retrieval-Augmented Generation (RAG) pipeline. It uses open-source Large Language Models (LLMs) to answer questions based on a set of local documents. The entire process, from document processing to model inference, runs on your machine without requiring any API keys or internet access after the initial model download.
+This project provides a local-only Retrieval-Augmented Generation (RAG) pipeline. It uses open-source Large Language Models (LLMs) to answer questions based on a set of local documents. The entire process, from document processing to model inference, runs on your machine without requiring any API keys or internet access after the initial model download.
 
 ### Features
 
-**100% Local**: All components, including the LLM, run locally. No data is sent to external services.
-**Document-Based Q&A**: Inspects PDF documents from a local folder and uses them as a knowledge base.
-**Swappable LLMs**: Easily switch between different open-source LLMs like Llama 3 (Meta), Mistral, Phi-3 (Microsoft), and Gemma (Google).
-**Efficient Vector Storage**: Uses FAISS for creating and loading a local vector database, so you only need to process your documents once.
-**Dynamic Queries**: Ask questions directly or provide them via a text file.
-**Registration-Free Models**: The model catalog is pre-configured to use non-gated GGUF model repositories, allowing for hassle-free downloads.
+* **100% Local**: All components, including the LLM, run locally. No data is sent to external services.
+* **Document-Based Q&A**: Inspects PDF documents from a local folder and uses them as a knowledge base.
+* **Swappable LLMs**: Easily switch between different open-source LLMs like Llama 3 (Meta), Mistral, Phi-3 (Microsoft), and Gemma (Google).
+* **Efficient Vector Storage**: Uses FAISS for creating and loading a local vector database, so you only need to process your documents once.
+* **Dynamic Queries**: Ask questions directly or provide them via a text file.
+* **Registration-Free Models**: The model catalog is pre-configured to use non-gated GGUF model repositories, allowing for hassle-free downloads.
 
 ### Project Structure.
 ```bash
