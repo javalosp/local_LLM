@@ -5,26 +5,25 @@ This project provides a local-only Retrieval-Augmented Generation (RAG) pipeline
 ### Features
 
 * **100% Local**: All components, including the LLM, run locally. No data is sent to external services.
-* **Document-Based Q&A**: Inspects PDF documents from a local folder and uses them as a knowledge base.
-* **Swappable LLMs**: Easily switch between different open-source LLMs like Llama 3 (Meta), Mistral, Phi-3 (Microsoft), and Gemma (Google).
-* **Efficient Vector Storage**: Uses FAISS for creating and loading a local vector database, so you only need to process your documents once.
-* **Dynamic Queries**: Ask questions directly or provide them via a text file.
-* **Registration-Free Models**: The model catalog is pre-configured to use non-gated GGUF model repositories, allowing for hassle-free downloads.
+* **Document-Based Q&A**: Review PDF documents from a local folder and use them as a knowledge base.
+* **Swappable LLMs**: Easily switch between different open-source LLMs like Mistral, Llama 3 (Meta), Phi-3 (Microsoft), and Gemma (Google).
+* **Efficient Vector Storage**: Documents are only processed once by creating a local vector database with the documents information.
+* **Registration-Free Models**: The model catalog is pre-configured to use non-gated GGUF model repositories, allowing for easy downloads.
+* **Dynamic Queries**: Ask questions directly (hardcoded) or provide them via a text file. A user interface can be integrated in the future.
 
 ### Project Structure.
 ```bash
-    ├── sources/              # Place your source PDF documents here
+    ├── sources/              # Contains the source PDF documents
     ├── models/               # LLM models will be downloaded here automatically
-    ├── vectorstore/          # FAISS vector databases are stored here
+    ├── vectorstore/          # Stores FAISS vector databases
     ├── main.py               # Main execution script
     ├── preprocess.py         # Handles document loading and vectorisation
     ├── llm_model_setup.py    # Manages LLM model downloading and setup
     ├── catalogs.py           # Contains the catalog of available LLMs
-    ├── settings.py           # Main configuration file (select your model here)
+    ├── settings.py           # Main configuration file (Set up your model settings here)
     ├── requirements.txt      # Python dependencies
     └── llm_notebook.ipynb    # Jupyter notebook for interactive testing
 ```
-
 
 ## Getting Started
 Follow these steps to set up and run the project on your local machine.
@@ -51,12 +50,12 @@ Follow these steps to set up and run the project on your local machine.
 3. Set Up a Virtual Environment:
     ```bash
     # Create a virtual environment
-    python -m venv venv
+    python -m venv /path/to/new/virtual/environment
     # Activate it
     # On Windows:
-    venv\Scripts\activate
+    C:\path\to\new\virtual\environment\Scripts\activate
     # On macOS/Linux:
-    source venv/bin/activate
+    source /path/to/new/virtual/environment/bin/activate
     ```
 4. Install Dependencies:
     Install all the required Python libraries using the requirements.txt file.
@@ -67,12 +66,13 @@ Follow these steps to set up and run the project on your local machine.
 ## Configuration
 
 1. Add Your Documents: 
-Place all the PDF files you want the LLM to learn from into the `sources/` directory.
+Place all the PDF files you want the LLM to review into the `sources/` directory.
+
 2. Select Your LLM:
 Open the settings.py file and choose the model you want to use.
 The MODELS_CATALOG in catalogs.py lists all available options.
 
-The first time you run the script with a new model, it will be automatically downloaded from Hugging Face and saved to the models/ directory. This may take some time depending on the model size and your internet connection.
+The first time you run the script with a new model, it will be automatically downloaded from Hugging Face and saved to the `models/` directory. This may take some time depending on the model size and your internet connection.
 
 ## How to Run
 
@@ -84,32 +84,28 @@ To run with the default, hardcoded query in main.py:
     ```
 2. Using a Query from a File
 You can provide a query from a text file using the `--query_file` argument.
-Create a file, e.g., `question.txt`, and write your question in it
-
-Run the script and point to your file:
-```bash
-python main.py --query_file question.txt
-```
+* Create a file, e.g., [question.txt](./question.txt), and write your question in it
+* Run the script using the `--query_file` flag:
+    ```bash
+    python main.py --query_file question.txt
+    ```
 
 The script will then load the documents, create or load the vector store, initialise the LLM, and generate an answer based on your query and the provided context.
 
 #### Interactive Notebook
-For experimentation and debugging, you can use the llm_notebook.ipynb. It contains the same pipeline logic broken down into cells, allowing you to inspect each step of the process.
-To use it, start a Jupyter Lab session, then open the llm_notebook.ipynb file in the Jupyter interface.
-
+For experimentation and debugging, you can use the [llm_notebook.ipynb](llm_notebook.ipynb) jupyter notebook. It contains the same pipeline logic broken down into cells, allowing you to inspect each step of the process.
+To use it, start a Jupyter Lab session, then open the [llm_notebook.ipynb](llm_notebook.ipynb) file in the Jupyter interface.
 
 
 # Running on Imperial College HPC:
 
 It is recommended to use [Conda](https://docs.conda.io/en/latest/index.html) as explained in the [Imperial College London's RCS User Guide](https://icl-rcs-user-guide.readthedocs.io/en/latest/hpc/applications/guides/conda/):
 
-1. Install and set up **conda-forge**
+1. Install and set up **conda-forge** (*This is required only the first time*)
     ```bash
     module load miniforge/3
     miniforge-setup
     ```
-    This is required only the first time
-
 2. Load Conda
     ```bash
     eval "$(~/miniforge3/bin/conda shell.bash hook)"
@@ -120,7 +116,7 @@ It is recommended to use [Conda](https://docs.conda.io/en/latest/index.html) as 
     ```
 4. Activate the new environment
     ```bash
-    conda activate llm_venv
+    conda activate venv_name
     ```
 5. Install required libraries    
     ```bash
