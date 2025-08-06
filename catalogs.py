@@ -4,7 +4,7 @@ MODELS_CATALOG = {
         "repo_id": "TheBloke/Mistral-7B-Instruct-v0.2-GGUF",
         "filename": "mistral-7b-instruct-v0.2.Q4_K_M.gguf"
                 },
-    "llama": {
+    "llama3": {
         "id": "llama-3-8b",
         "repo_id": "meta-llama/Meta-Llama-3-8B-Instruct-GGUF",
         "filename": "Meta-Llama-3-8B-Instruct.Q4_K_M.gguf"
@@ -30,14 +30,14 @@ MODELS_CATALOG = {
         "filename": "Phi-4-medium-14k-instruct.Q4_K_M.gguf",
     },
     "gemma2": {
-        "id": "gemma-2-27b-instruct",
-        "repo_id": "google/gemma-2-27b-it-gguf",
-        "filename": "gemma-2-27b-it.Q4_K_M.gguf",
+        "id": "gemma-2-9b-instruct", # Using 9B as 27B is very large for local use
+        "repo_id": "QuantFactory/gemma-2-9b-it-GGUF", # Non-gated repo
+        "filename": "gemma-2-9b-it.Q4_K_M.gguf",
     },
     "deepseek": {
-        "id": "deepseek-v2-chat",
-        "repo_id": "deepseek-ai/DeepSeek-V2-chat-GGUF", # Assumed GGUF provider
-        "filename": "deepseek-v2-chat.Q4_K_M.gguf",
+        "id": "deepseek-v2-lite-chat",
+        "repo_id": "QuantFactory/DeepSeek-V2-Lite-Chat-GGUF", # Non-gated repo
+        "filename": "DeepSeek-V2-Lite-Chat.Q4_K_M.gguf",
     },
 }
 

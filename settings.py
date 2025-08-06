@@ -2,6 +2,8 @@ embeddings_model_name = "minilm"
 
 method = "llamacpp"
 
+# Set the model you want to use. Options are:
+# "mistral", "llama3", "phi3", "gemma", "gemma2", "deepseek"
 #model = "mistral"
 #model = "llama" # Gated repo
 #model = "nemotron" #Repository not found

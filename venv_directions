@@ -1,8 +1,3 @@
-The standard virtual environment (venv) only selfcontains python packages
-For packages that require compiling C, C++,... code we need to have the appropriate build tools
-Therefore it's necessary to use a venv that also self contains those tools
-Moving to Conda
-From Terminal
 Load Conda
 eval "$(~/miniforge3/bin/conda shell.bash hook)"
 
