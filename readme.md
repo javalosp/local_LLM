@@ -20,7 +20,7 @@ This project provides a local-only Retrieval-Augmented Generation (RAG) pipeline
     ├── preprocess.py         # Handles document loading and vectorisation
     ├── llm_model_setup.py    # Manages LLM model downloading and setup
     ├── catalogs.py           # Contains the catalog of available LLMs
-    ├── settings.py           # Main configuration file (Set up your model settings here)
+    ├── settings.py           # Main configuration file (define your model settings here)
     ├── requirements.txt      # Python dependencies
     └── llm_notebook.ipynb    # Jupyter notebook for interactive testing
 ```
