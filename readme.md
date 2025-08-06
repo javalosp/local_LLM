@@ -17,7 +17,7 @@ This project provides a local-only Retrieval-Augmented Generation (RAG) pipeline
     ├── models/               # LLM models will be downloaded here automatically
     ├── vectorstore/          # FAISS vector databases are stored here
     ├── main.py               # Main execution script
-    ├── preprocess.py         # Handles document loading and vectorization
+    ├── preprocess.py         # Handles document loading and vectorisation
     ├── llm_model_setup.py    # Manages LLM model downloading and setup
     ├── catalogs.py           # Contains the catalog of available LLMs
     ├── settings.py           # Main configuration file (select your model here)
@@ -91,7 +91,7 @@ Run the script and point to your file:
 python main.py --query_file question.txt
 ```
 
-The script will then load the documents, create or load the vector store, initialize the LLM, and generate an answer based on your query and the provided context.
+The script will then load the documents, create or load the vector store, initialise the LLM, and generate an answer based on your query and the provided context.
 
 #### Interactive Notebook
 For experimentation and debugging, you can use the llm_notebook.ipynb. It contains the same pipeline logic broken down into cells, allowing you to inspect each step of the process.
