@@ -130,7 +130,7 @@ It is recommended to use [Conda](https://docs.conda.io/en/latest/index.html) as 
     CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install --force-reinstall --no-cache-dir llama-cpp-python
     ```
 
-#### Using the jypyter notebook on the HPC
+#### Using the jupyter notebook on the HPC
 For using the jupyter notebook on the HPC it is necessary to install a kernel based on the virtual environment
 
 1. Install jupyterlab kernel
