@@ -129,7 +129,7 @@ def load_vector_store(embeddings_model_name, VECTORSTORE_PATH, texts, verbosity=
 
     Args:
         embeddings_model_name (str): The name or path of the sentence-transformer
-            model required to initialize the embeddings.
+            model required to initialise the embeddings.
         VECTORSTORE_PATH (str): The directory path where the FAISS vector
             store is located or will be saved.
         texts (List[Document]): A list of LangChain `Document` objects. This is

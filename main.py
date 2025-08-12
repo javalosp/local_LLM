@@ -66,6 +66,7 @@ def main(write_log=True):
     if args.query_file:
         query = get_query_from_file(args.query_file)
         if query is None:
+            logger.warning(f"You have passed '--query_file' flag. However, file {args.query_file} was not found. Exiting.")
             return # Exit if file not found
     else:
         # Use a hardcoded query

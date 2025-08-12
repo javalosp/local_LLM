@@ -85,7 +85,7 @@ def create_llm(method, model, MODELS_CATALOG, download_dir="models"):
             finding GGUF model files. Defaults to "models".
 
     Returns:
-        object: An initialized LangChain LLM object (either `LlamaCpp` or
+        object: An initialised LangChain LLM object (either `LlamaCpp` or
         `CTransformers`).
 
     Raises:
@@ -145,12 +145,12 @@ def create_retrieval_chain(db, prompt_template, llm):
     also set to retrieve the top 2 most relevant chunks for a given query.
 
     Args:
-        db (VectorStore): An initialized LangChain VectorStore object (e.g., FAISS)
+        db (VectorStore): An initialised LangChain VectorStore object (e.g., FAISS)
             that contains the document embeddings and will be used for retrieval.
         prompt_template (str): The string template for the final prompt sent to
             the language model. It must include the placeholders `{context}`
             and `{question}`.
-        llm (LLM): An initialized LangChain language model object that will
+        llm (LLM): An initialised LangChain language model object that will
             generate the final answer based on the prompt.
 
     Returns:
