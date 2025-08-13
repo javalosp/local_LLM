@@ -1,11 +1,14 @@
 import os
 import logging
 from pathlib import Path
-from langchain.document_loaders import PyPDFLoader
+#from langchain.document_loaders import PyPDFLoader  # deprecated
+#from langchain_community.embeddings import HuggingFaceEmbeddings  # deprecated
+#from langchain.embeddings import HuggingFaceEmbeddings  # deprecated
+#from langchain.vectorstores import FAISS  # deprecated
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import FAISS
 
 from catalogs import MODELS_CATALOG, EMBEDDING_MODELS_CATALOG
 from settings import DATA_PATH, embeddings_model_name, BASE_VECTORSTORE_DIR, VECTORSTORE_PATH, prompt_template

@@ -1,7 +1,8 @@
 import os
 import logging
 
-from langchain.llms import LlamaCpp, CTransformers
+#from langchain.llms import LlamaCpp, CTransformers  # deprecated
+from langchain_community.llms import LlamaCpp, CTransformers
 
 from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA

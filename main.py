@@ -75,7 +75,8 @@ def main(write_log=True):
 
     # Now use the question-answer retrieval chain
     logger.info(f"\nExecuting query: {query}\n")
-    result = qa_chain({"query": query})
+    #result = qa_chain({"query": query})
+    result = qa_chain.invoke(input=query)
 
     # Print the result
     logger.info("\n--- Generated Answer ---\n")
