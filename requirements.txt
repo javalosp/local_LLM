@@ -6,3 +6,5 @@ pypdf
 sentence-transformers
 faiss-cpu
 llama-cpp-python
+sphinx
+furo
