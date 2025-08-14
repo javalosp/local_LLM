@@ -1,21 +1,70 @@
 import logging
 import sys
 
-# Get a logger for this module. It inherits the root configuration.
-logger = logging.getLogger(__name__)
 
-def setup_logging():
+class StreamToLogger:
     """
-    Configures the root logger for the application.
+    A helper class to redirect a stream (like stdout or stderr) to a logger.
+    This is required to write outputs from cpp libraries (e.g. LlamaCpp) to the 
+    log file
+    """
+    def __init__(self, logger, level):
+        self.logger = logger
+        self.level = level
+        self.linebuf = ''
+
+    def write(self, buf):
+        for line in buf.rstrip().splitlines():
+            self.logger.log(self.level, line.rstrip())
+
+    def flush(self):
+        pass
+
+
+def setup_logging(console_level=logging.WARNING, file_level=logging.INFO):
+    """
+    Manually configures the logger with separate levels for console and file.
+    """
+    # Get the root logger
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)  # Set the lowest possible level on the logger itself
+
+    # Clear existing handlers to prevent duplicate logs
+    if logger.hasHandlers():
+        logger.handlers.clear()
+
+    formatter = logging.Formatter(
+        "%(asctime)s [%(levelname)s] - %(name)s - %(message)s"
+    )
+
+    # --- Console Handler ---
+    # Only shows WARNING and above on the screen
+    stream_handler = logging.StreamHandler(sys.stdout)
+    stream_handler.setLevel(console_level)
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
+
+    # --- File Handler ---
+    # Writes INFO and above to the log file
+    file_handler = logging.FileHandler("local_llm.log", mode='w')
+    file_handler.setLevel(file_level)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
+
+def setup_logging_(level=logging.INFO):
+    """
+    Configures the root logger for the application with a specified level.
 
     This should be called once at the start of the main script. It sets up
     logging to output to both a file (`local_llm.log`) and the console.
     """
     logging.basicConfig(
-        level=logging.INFO,
+        level=level,
         format="%(asctime)s [%(levelname)s] - %(name)s - %(message)s",
         handlers=[
-            logging.FileHandler("local_llm.log"),
+            #logging.FileHandler("local_llm.log"), # Append log info to existing file
+            logging.FileHandler("local_llm.log", mode='w'), # Overwrite log file
             logging.StreamHandler(sys.stdout)
         ]
     )

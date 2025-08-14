@@ -1,5 +1,6 @@
 import os
 import logging
+from contextlib import redirect_stdout, redirect_stderr
 
 #from langchain.llms import LlamaCpp, CTransformers  # deprecated
 from langchain_community.llms import LlamaCpp, CTransformers
@@ -9,11 +10,13 @@ from langchain.chains import RetrievalQA
 
 from huggingface_hub import hf_hub_download
 
+from utils import StreamToLogger
+
 # Get a logger for this module. It inherits the root configuration.
 logger = logging.getLogger(__name__)
 
 
-def get_model_params(method, model=None, use_gpu=None):
+def get_model_params(method, model=None, use_gpu=None, verbose=False):
     """Generates a dictionary of default parameters for an LLM loading method.
 
     This function acts as a configuration helper, centralising the default
@@ -51,7 +54,7 @@ def get_model_params(method, model=None, use_gpu=None):
             "n_batch": 512,
             "n_ctx": 2048,
             "f16_kv": True, # Important for Mistral, Llama 3, and Phi-3
-            "verbose": True,
+            "verbose": verbose,
         }
     elif method == "ctransformers":
         logger.info("Loading model parameters using CTransformers...")
@@ -64,7 +67,7 @@ def get_model_params(method, model=None, use_gpu=None):
     return model_params
     
 
-def create_llm(method, model, MODELS_CATALOG, download_dir="models"):
+def create_llm(method, model, MODELS_CATALOG, download_dir="models", verbosity=1):
     """Creates a LangChain LLM object, handling model download and configuration.
 
     This factory function streamlines the process of initialising a local language
@@ -84,6 +87,8 @@ def create_llm(method, model, MODELS_CATALOG, download_dir="models"):
             'id', 'repo_id', and 'filename'.
         download_dir (str, optional): The root directory for storing and
             finding GGUF model files. Defaults to "models".
+        verbosity (int, optional): Verbosity level (0: Silent, 1: Normal, 2: Debug).
+            Defaults to "1"
 
     Returns:
         object: An initialised LangChain LLM object (either `LlamaCpp` or
@@ -99,7 +104,7 @@ def create_llm(method, model, MODELS_CATALOG, download_dir="models"):
     model_info = MODELS_CATALOG[model]
     
     model_path = f"{download_dir}/{model_info['filename']}" # The full path to the GGUF model file.
-    model_params = get_model_params(method, model=model)
+    model_params = get_model_params(method, model=model, verbose=(verbosity == 2)) # Set verbosity to True only for Debug level
 
     # Check if the model has been previously downloaded
     # If not found, try to download it from Hugging Face Hub using hf_hub_download
@@ -122,16 +127,38 @@ def create_llm(method, model, MODELS_CATALOG, download_dir="models"):
             raise
 
 
-    if method == "llamacpp":
-        logger.info("Loading model using LlamaCpp...")
-        return LlamaCpp(model_path=model_path, **model_params)
+    # Execute the chain with output redirection according to verbosity level
+    if verbosity >= 0:
+        # If verbosity is high, redirect C++ library output to our logger
+        logger.debug("Using DEBUG logging, i.e. --verbosity 2")
+        logger.debug("Redirecting C++ library output to logger.")
         
-    elif method == "ctransformers":
-        logger.info("Loading model using CTransformers...")
-        return CTransformers(model=model_path, **model_params)
+        # Create stream objects that point to our logger
+        stdout_logger = StreamToLogger(logger, logging.DEBUG)
+        stderr_logger = StreamToLogger(logger, logging.ERROR)
         
+        with redirect_stdout(stdout_logger), redirect_stderr(stderr_logger):
+            if method == "llamacpp":
+                logger.info("Loading model using LlamaCpp...")
+                return LlamaCpp(model_path=model_path, **model_params)
+                
+            elif method == "ctransformers":
+                logger.info("Loading model using CTransformers...")
+                return CTransformers(model=model_path, **model_params)
+            
+            else:
+                raise ValueError(f"Unsupported method: '{method}'. Choose 'llamacpp' or 'ctransformers'.")
     else:
-        raise ValueError(f"Unsupported method: '{method}'. Choose 'llamacpp' or 'ctransformers'.")
+        if method == "llamacpp":
+            logger.info("Loading model using LlamaCpp...")
+            return LlamaCpp(model_path=model_path, **model_params)
+            
+        elif method == "ctransformers":
+            logger.info("Loading model using CTransformers...")
+            return CTransformers(model=model_path, **model_params)    
+        
+        else:
+            raise ValueError(f"Unsupported method: '{method}'. Choose 'llamacpp' or 'ctransformers'.")
     
 
 def create_retrieval_chain(db, prompt_template, llm):
