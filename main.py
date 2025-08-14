@@ -8,7 +8,7 @@ from catalogs import MODELS_CATALOG, EMBEDDING_MODELS_CATALOG
 from settings import DATA_PATH, embeddings_model_name, BASE_VECTORSTORE_DIR, VECTORSTORE_PATH, prompt_template, method, model
 from preprocess import load_sources, split_documents, load_vector_store
 from llm_model_setup import create_llm, create_retrieval_chain
-from utils import setup_logging, get_query_from_file, StreamToLogger
+from utils import initialise_logging, setup_logging, get_query_from_file, StreamToLogger
 
 
 def main(write_log=True):
@@ -35,44 +35,19 @@ def main(write_log=True):
     parser.add_argument("-v", "--verbosity", type=int, default=1, choices=[0, 1, 2], help="Set the verbosity level: 0=silent, 1=info, 2=debug.")
     
     args = parser.parse_args()
-
-    # Set a default verbosity value to pass to create_llm function
-    verbosity = 1
-
-    # Initialise logger
-    # Conditionally configure logging based on the command-line argument
-    if args.log or write_log:
-        if args.verbosity:
-            # Map the integer verbosity level to a logging level
-            log_levels = {
-                0: logging.WARNING, # Silent: only show warnings and errors
-                1: logging.INFO,    # Normal: show info, warnings, and errors
-                2: logging.DEBUG,   # Debug: show all messages
-            }
-            #setup_logging(level=log_levels.get(args.verbosity))
-            # Set console level below file level
-            if log_levels.get(args.verbosity) < 2:
-                setup_logging(console_level=0, file_level=log_levels.get(args.verbosity))
-            else:
-                setup_logging(console_level=1, file_level=log_levels.get(args.verbosity))
-            
-            # Update verbosity value
-            verbosity = args.verbosity
-        else:
-            # If no verbosity level is passed, just use the default level:
-            # level=logging.INFO
-            setup_logging()
     
-    # Get a logger for this specific module
+    # Initialise logging according to verbosity level
+    # if verbosity argument is not passed, it's defaul value (1) is used
+    initialise_logging(args.verbosity)
+    
     logger = logging.getLogger(__name__)
-    
+
     logger.info("Starting Local LLM application...")
-    logger.debug("Using DEBUG logging, i.e. --verbosity 2")
 
     # Create a local instance of the LLM with the given settings
     # We do this first to make sure that the model is usable
     # before processing the data sources
-    llm = create_llm(method, model, MODELS_CATALOG, download_dir="models", verbosity=verbosity)
+    llm = create_llm(method, model, MODELS_CATALOG, download_dir="models", verbosity=args.verbosity)
 
     # Pre-process data sources
     logger.info(f"Loading documents from: {DATA_PATH}")

@@ -1,6 +1,8 @@
 import logging
 import sys
 
+# Get a logger for this module. It inherits the root configuration.
+logger = logging.getLogger(__name__)
 
 class StreamToLogger:
     """
@@ -68,6 +70,31 @@ def setup_logging_(level=logging.INFO):
             logging.StreamHandler(sys.stdout)
         ]
     )
+
+def initialise_logging(verbosity):
+    """
+    Initialises the application's logging based on a verbosity level.
+
+    Args:
+        verbosity (int): The verbosity level (0, 1, or 2).
+        Defaults to 1 (Normal)
+    """
+    log_levels = {
+        0: "Silent (Log Warnings, Console Critical)",
+        1: "Normal (Log Info, Console Warnings)",
+        2: "Debug (Log Debug, Console Info)",
+    }
+
+    if verbosity == 0:
+        setup_logging(console_level=logging.CRITICAL, file_level=logging.WARNING)
+    elif verbosity == 1:
+        setup_logging(console_level=logging.WARNING, file_level=logging.INFO)
+    elif verbosity == 2:
+        setup_logging(console_level=logging.INFO, file_level=logging.DEBUG)
+    
+    logger = logging.getLogger(__name__)
+    logger.info("Logging initialised.")
+    logger.info(f"Verbosity level set to {verbosity}: {log_levels.get(verbosity, 'Unknown')}")
 
 
 def get_query_from_file(file_path):
