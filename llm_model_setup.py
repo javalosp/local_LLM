@@ -10,7 +10,7 @@ from langchain.chains import RetrievalQA
 
 from huggingface_hub import hf_hub_download
 
-from utils import StreamToLogger
+from utils import StreamToLogger, check_gpu
 
 # Get a logger for this module. It inherits the root configuration.
 logger = logging.getLogger(__name__)
@@ -104,7 +104,9 @@ def create_llm(method, model, MODELS_CATALOG, download_dir="models", verbosity=1
     model_info = MODELS_CATALOG[model]
     
     model_path = f"{download_dir}/{model_info['filename']}" # The full path to the GGUF model file.
-    model_params = get_model_params(method, model=model, verbose=(verbosity == 2)) # Set verbosity to True only for Debug level
+
+    # Check if GPU is available
+    model_params = get_model_params(method, model=model, use_gpu=check_gpu(), verbose=(verbosity == 2)) # Set verbosity to True only for Debug level
 
     # Check if the model has been previously downloaded
     # If not found, try to download it from Hugging Face Hub using hf_hub_download

@@ -42,13 +42,17 @@ def load_sources(DATA_PATH, verbosity=1):
         Returns an empty list if no PDF files are found.
     """
     documents = []
+    num_files = 0
     for file in os.listdir(DATA_PATH):
         if file.endswith('.pdf'):
             pdf_path = os.path.join(DATA_PATH, file)
             loader = PyPDFLoader(pdf_path)
+            if verbosity > 0:    
+                logger.info(f"Reading file {file} ({len(loader.load())} pages).")
             documents.extend(loader.load())
+            num_files += 1
     if verbosity > 0:    
-        logger.info(f"Loaded {len(documents)} pages from PDF files.")
+        logger.info(f"Loaded {len(documents)} pages from {num_files} PDF files.")
     return documents
 
 

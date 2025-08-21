@@ -1,5 +1,6 @@
 import logging
 import sys
+import subprocess
 
 # Get a logger for this module. It inherits the root configuration.
 logger = logging.getLogger(__name__)
@@ -97,64 +98,52 @@ def initialise_logging(verbosity):
     logger.info(f"Verbosity level set to {verbosity}: {log_levels.get(verbosity, 'Unknown')}")
 
 
-def display_result(result, log_output=True, display_on_screen=True, output_filename=None):
+def display_result(result, bibliography_style=False, log_output=True, display_on_screen=True, output_filename=None):
     """
     Formats and displays the Retrieval-Augmented Generation (RAG) chain result.
 
     Args:
         result (dict): The result dictionary from the RetrievalQA chain.
+        bibliography_style (bool): If True, formats sources as a bibliography.
+                                   If False, shows source text snippets.
         log_output (bool): If True, writes the full output to the log file.
         display_on_screen (bool): If True, prints the result to the console.
         output_filename (str, optional): If a file path is provided, saves the
-            formatted output to that file. Defaults to None.
+                                      formatted output to that file.
     """
-    
-    print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
-    print(result.keys())
-    print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
-    print(result['query'])
-    print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
-    print(result['result'])
-    print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
-    print(result['source_documents'])
-    print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
-    
+    # Format the Answer
+    output_text = f"Generated Answer\n{result['result']}\n\n"
 
-    # Format the output
-    output_text = f"--- Generated Answer ---\n{result['result']}\n\n--- Source Documents Used ---\n"
-    
-    # Inspect the metadata of the source documents used for the answer to retrieve references
-    sources = []
-    for doc in result['source_documents']:
-        page_num = doc.metadata.get('page', 'N/A')
-        source_info = f"- Page {page_num}: {doc.page_content[:200]}..."
-        sources.append(source_info)
-        authors = doc.metadata.get('author', 'N/A')
-        title = doc.metadata.get('title', 'N/A')
-        year = doc.metadata.get('creationdate', 'N/A')[:4]
-        source_file = doc.metadata.get('source', 'N/A')
+    # Format the Sources
+    if bibliography_style:
+        output_text += "References\n"
+        unique_sources = {}
+        for doc in result['source_documents']:
+            metadata = doc.metadata
+            source_file = metadata.get('source', 'N/A')
+            if source_file not in unique_sources:
+                author = metadata.get('author', 'Unknown Author')
+                title = metadata.get('title', 'Untitled Document')
+                # Extract year from creation date string like 'D:20240101...'
+                year = metadata.get('creationdate', 'N/A')
+                if year.startswith('D:'):
+                    year = year[2:6]
+                else:
+                    year = year[:4]
+
+                unique_sources[source_file] = f"- {author} ({year}). *{title}*. Retrieved from: {source_file}"
         
-        print('############################################################')
-        print(doc.metadata)
-        print('*************************************************')
-        print(page_num)
-        print('*************************************************')
-        print(source_info)
-        print('*************************************************')
-        print(sources)
-        print('*************************************************')
-        print(authors)
-        print('*************************************************')
-        print(title)
-        print('*************************************************')
-        print(year)
-        print('*************************************************')
-        print(source_file)
-        print('-----------------------------------------------------------------')
-    
-    output_text += "\n".join(sources)
+        output_text += "\n".join(unique_sources.values())
+    else:
+        output_text += "Source Documents Used\n"
+        sources = []
+        for doc in result['source_documents']:
+            page_num = doc.metadata.get('page', 'N/A')
+            source_info = f"- Page {page_num}: {doc.page_content[:200]}..."
+            sources.append(source_info)
+        output_text += "\n".join(sources)
 
-    # Direct the output
+    # Direct the Output
     if log_output:
         logger.info(f"\n{output_text}")
     
@@ -168,7 +157,6 @@ def display_result(result, log_output=True, display_on_screen=True, output_filen
             logger.info(f"Result saved successfully to {output_filename}")
         except Exception:
             logger.exception(f"Failed to save result to file: {output_filename}")
-
 
 
 def get_query_from_file(file_path):
@@ -194,3 +182,22 @@ def get_query_from_file(file_path):
     except FileNotFoundError:
         logger.exception(f"Error: Query file not found at {file_path}")
         return None
+    
+
+    def check_gpu():
+        """
+        Checks if an NVIDIA GPU is available and accessible.
+
+        Returns:
+            bool: True if an NVIDIA GPU is detected, False otherwise.
+        """
+
+        try:
+            # The 'nvidia-smi' command lists NVIDIA GPUs. If it runs, a GPU exists.
+            subprocess.check_output('nvidia-smi')
+            logger.info("NVIDIA GPU detected.")
+            return True
+        except Exception:
+            # The command will fail if 'nvidia-smi' is not found or no GPU is present.
+            logger.info("No NVIDIA GPU detected in the system.")
+            return False

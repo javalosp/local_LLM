@@ -34,6 +34,7 @@ def main(write_log=True):
     parser.add_argument("--log", action="store_true", help="Enable detailed logging to a file and the console.")
     parser.add_argument("-v", "--verbosity", type=int, default=1, choices=[0, 1, 2], help="Set the verbosity level: 0=silent, 1=info, 2=debug.")
     parser.add_argument("-o", "--output_file", type=str, default=None, help="Path to a text file to save the final output.")
+    parser.add_argument("-l", "--bibliography", action="store_true", help="Display sources in a bibliography format instead of text snippets.")
     
     args = parser.parse_args()
     
@@ -59,7 +60,7 @@ def main(write_log=True):
         return
 
     texts = split_documents(documents)
-    db = load_vector_store(EMBEDDING_MODELS_CATALOG[embeddings_model_name], VECTORSTORE_PATH, texts)
+    db = load_vector_store(EMBEDDING_MODELS_CATALOG[embeddings_model_name], VECTORSTORE_PATH, texts, verbosity=args.verbosity)
 
     # Create an instance of a question-answer retrieval chain using the database created and the LLM
     qa_chain = create_retrieval_chain(db, prompt_template, llm)
@@ -97,8 +98,16 @@ def main(write_log=True):
         result = qa_chain.invoke(input=query)
 
     # Print the result
+    #display_result(
+    #               result,
+    #               log_output=True, # Always log the result
+    #               display_on_screen=True, # Always show on screen
+    #               output_filename=args.output_file # Save to file if path is provided
+    #              )
+    
     display_result(
                    result,
+                   bibliography_style=args.bibliography,
                    log_output=True, # Always log the result
                    display_on_screen=True, # Always show on screen
                    output_filename=args.output_file # Save to file if path is provided
