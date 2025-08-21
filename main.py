@@ -8,7 +8,7 @@ from catalogs import MODELS_CATALOG, EMBEDDING_MODELS_CATALOG
 from settings import DATA_PATH, embeddings_model_name, BASE_VECTORSTORE_DIR, VECTORSTORE_PATH, prompt_template, method, model
 from preprocess import load_sources, split_documents, load_vector_store
 from llm_model_setup import create_llm, create_retrieval_chain
-from utils import initialise_logging, setup_logging, get_query_from_file, StreamToLogger
+from utils import initialise_logging, display_result, get_query_from_file, StreamToLogger
 
 
 def main(write_log=True):
@@ -33,6 +33,7 @@ def main(write_log=True):
     parser.add_argument("--query_file", type=str, help="Path to a text file containing the query.")
     parser.add_argument("--log", action="store_true", help="Enable detailed logging to a file and the console.")
     parser.add_argument("-v", "--verbosity", type=int, default=1, choices=[0, 1, 2], help="Set the verbosity level: 0=silent, 1=info, 2=debug.")
+    parser.add_argument("-o", "--output_file", type=str, default=None, help="Path to a text file to save the final output.")
     
     args = parser.parse_args()
     
@@ -77,8 +78,6 @@ def main(write_log=True):
 
     # Now use the question-answer retrieval chain
     logger.info(f"\nExecuting query: {query}\n")
-    #result = qa_chain({"query": query}) # deprecated
-    result = qa_chain.invoke(input=query)
 
     # Execute the chain with output redirection according to verbosity level
     if args.verbosity == 2:
@@ -91,18 +90,28 @@ def main(write_log=True):
         stderr_logger = StreamToLogger(logger, logging.ERROR)
         
         with redirect_stdout(stdout_logger), redirect_stderr(stderr_logger):
+            #result = qa_chain({"query": query}) # deprecated
             result = qa_chain.invoke(input=query)
     else:
+        #result = qa_chain({"query": query}) # deprecated
         result = qa_chain.invoke(input=query)
 
     # Print the result
-    logger.info("\n--- Generated Answer ---\n")
-    logger.info(result['result'])
+    display_result(
+                   result,
+                   log_output=True, # Always log the result
+                   display_on_screen=True, # Always show on screen
+                   output_filename=args.output_file # Save to file if path is provided
+                  )
+
+    #logger.info("\n--- Generated Answer ---\n")
+    #logger.info(result['result'])
 
     # Inspect the metadata of the source documents used for the answer to retrieve references
-    logger.info("\n--- Source Documents Used ---\n")
-    for doc in result['source_documents']:
-        logger.info(f"- Page {doc.metadata.get('page', 'N/A')}: {doc.page_content[:200]}...")
+    #logger.info("\n--- Source Documents Used ---\n")
+    #for doc in result['source_documents']: 
+    #    logger.info(f"- Page {doc.metadata.get('page', 'N/A')}: {doc.page_content[:200]}...")
+
 
 if __name__ == "__main__":
     main()

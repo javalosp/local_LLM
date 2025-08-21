@@ -97,6 +97,80 @@ def initialise_logging(verbosity):
     logger.info(f"Verbosity level set to {verbosity}: {log_levels.get(verbosity, 'Unknown')}")
 
 
+def display_result(result, log_output=True, display_on_screen=True, output_filename=None):
+    """
+    Formats and displays the Retrieval-Augmented Generation (RAG) chain result.
+
+    Args:
+        result (dict): The result dictionary from the RetrievalQA chain.
+        log_output (bool): If True, writes the full output to the log file.
+        display_on_screen (bool): If True, prints the result to the console.
+        output_filename (str, optional): If a file path is provided, saves the
+            formatted output to that file. Defaults to None.
+    """
+    
+    print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+    print(result.keys())
+    print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+    print(result['query'])
+    print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+    print(result['result'])
+    print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+    print(result['source_documents'])
+    print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+    
+
+    # Format the output
+    output_text = f"--- Generated Answer ---\n{result['result']}\n\n--- Source Documents Used ---\n"
+    
+    # Inspect the metadata of the source documents used for the answer to retrieve references
+    sources = []
+    for doc in result['source_documents']:
+        page_num = doc.metadata.get('page', 'N/A')
+        source_info = f"- Page {page_num}: {doc.page_content[:200]}..."
+        sources.append(source_info)
+        authors = doc.metadata.get('author', 'N/A')
+        title = doc.metadata.get('title', 'N/A')
+        year = doc.metadata.get('creationdate', 'N/A')[:4]
+        source_file = doc.metadata.get('source', 'N/A')
+        
+        print('############################################################')
+        print(doc.metadata)
+        print('*************************************************')
+        print(page_num)
+        print('*************************************************')
+        print(source_info)
+        print('*************************************************')
+        print(sources)
+        print('*************************************************')
+        print(authors)
+        print('*************************************************')
+        print(title)
+        print('*************************************************')
+        print(year)
+        print('*************************************************')
+        print(source_file)
+        print('-----------------------------------------------------------------')
+    
+    output_text += "\n".join(sources)
+
+    # Direct the output
+    if log_output:
+        logger.info(f"\n{output_text}")
+    
+    if display_on_screen:
+        print(f"\n{output_text}")
+    
+    if output_filename:
+        try:
+            with open(output_filename, 'w', encoding='utf-8') as f:
+                f.write(output_text)
+            logger.info(f"Result saved successfully to {output_filename}")
+        except Exception:
+            logger.exception(f"Failed to save result to file: {output_filename}")
+
+
+
 def get_query_from_file(file_path):
     """
     Reads a query from the specified text file. It's useful for running complex
